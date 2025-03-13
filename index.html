@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Cards - Microbiologie BP Coiffure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .flash-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            max-width: 500px;
+            margin: 20px auto;
+            break-inside: avoid;
+        }
+        
+        .card-header {
+            background-color: #6a1b9a;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .card-content {
+            padding: 15px;
+        }
+        
+        .card-content h3 {
+            color: #6a1b9a;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .card-content ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .card-content p {
+            margin-bottom: 10px;
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .image-container img {
+            width: 250px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin: 10px auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: white;
+            padding: 10px;
+        }
+        
+        .image-error {
+            display: none;
+            color: #6a1b9a;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        
+        .highlight {
+            color: #6a1b9a;
+            font-weight: bold;
+        }
+        
+        .category-title {
+            text-align: center;
+            color: #6a1b9a;
+            margin: 30px 0 15px 0;
+            font-size: 1.5em;
+            text-transform: uppercase;
+        }
+        
+        .sub-card {
+            background-color: #f9f0ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0e6f5;
+            color: #6a1b9a;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f0ff;
+        }
+
+        /* Mode Revision */
+        .revision-mode {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .revision-title {
+            text-align: center;
+            color: #6a1b9a;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-transform: uppercase;
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .category-button {
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .category-button:hover {
+            background-color: #9c27b0;
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .question-container {
+            background-color: #f9f0ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            color: #6a1b9a;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .answer-hint {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .answer-container {
+            background-color: #f0e6f5;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: #9c27b0;
+        }
+
+        .nav-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .toggle-mode {
+            display: block;
+            margin: 30px auto;
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-mode:hover {
+            background-color: #9c27b0;
+        }
+
+        #revision-mode {
+            display: none;
+        }
+
+        #study-mode {
+            display: block;
+        }
+        
+        .results-container {
+            background-color: #f0e6f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .results-title {
+            color: #6a1b9a;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .results-score {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .restart-button {
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        .restart-button:hover {
+            background-color: #9c27b0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mode Revision -->
+    <div id="revision-mode" class="revision-mode">
+        <h1 class="revision-title">Mode Révision</h1>
+        
+        <div class="category-buttons">
+            <button class="category-button" onclick="loadCategory('introduction')">Introduction à la Microbiologie</button>
+            <button class="category-button" onclick="loadCategory('defenses')">Défenses de l'Organisme</button>
+            <button class="category-button" onclick="loadCategory('peau')">La Peau</button>
+            <button class="category-button" onclick="loadCategory('circulation')">Appareil Circulatoire</button>
+            <button class="category-button" onclick="loadCategory('tms')">Troubles Musculo-Squelettiques</button>
+        </div>
+        
+        <div class="score-display">Score: <span id="score">0</span> / <span id="total-questions">0</span></div>
+        
+        <div class="question-container" id="question-container">
+            <div class="question-number" id="question-number">Question 1</div>
+            <div class="question-text" id="question-text">Qu'est-ce qu'un micro-organisme pathogène ?</div>
+            <div class="answer-hint" onclick="toggleAnswer()">Cliquez pour voir la réponse</div>
+            <div class="answer-container" id="answer-container">
+            <p>Un micro-organisme est pathogène lorsque sa présence dans un organisme provoque une maladie.</p>
+            </div>
+        </div>
+        
+        <div class="navigation-buttons">
+            <button class="nav-button" id="knew-button" onclick="knewAnswer()">Je savais</button>
+            <button class="nav-button" id="didnt-know-button" onclick="didntKnowAnswer()">Je ne savais pas</button>
+        </div>
+        
+        <div class="results-container" id="results-container">
+            <div class="results-title">Résultats</div>
+            <div class="results-score" id="results-score">Vous avez obtenu 0/0</div>
+            <button class="restart-button" onclick="restartQuiz()">Recommencer</button>
+            <button class="restart-button" onclick="reviewMissedQuestions()">Revoir les questions non maîtrisées</button>
+        </div>
+    </div>
+
+    <!-- Mode Étude -->
+    <div id="study-mode">
+        <!-- INTRODUCTION À LA MICROBIOLOGIE -->
+        <h2 class="category-title">Introduction à la Microbiologie</h2>
+
+        <div class="flash-card">
+            <div class="card-header">Le Monde Microbien</div>
+            <div class="card-content">
+                <p>Avec plus de <span class="highlight">500 000 espèces</span>, le monde microbien est un monde des plus vastes et diversifiés qui soit.</p>
+                <p>De la naissance à la mort, tout être humain est continuellement exposé à des organismes microscopiques provenant du sol, de l'air, de l'eau ainsi que d'autres êtres vivants de son entourage. On les trouve aussi sur les aliments, les matières en décomposition.</p>
+                <p>La très grande majorité des micro-organismes sont inoffensifs, certains sont même indispensables au maintien de l'équilibre des écosystèmes.</p>
+                <p>Lorsque les conditions environnementales sont favorables, la croissance d'une population microbienne peut être foudroyante. En quelques heures, une dizaine de micro-organismes forme une population colossale capable de causer une grave infection.</p>
+            </div>
+        </div>
+
+        <div class="flash-card">
+            <div class="card-header">Types de Micro-organismes</div>
+            <div class="card-content">
+                <p><span class="highlight">Modes de vie des micro-organismes</span> :</p>
+                <ul>
+                    <li>Certains micro-organismes n'ont pas besoin d'établir des rapports avec les êtres vivants pour se nourrir.</li>
+                    <li>D'autres parasitent les êtres vivants c'est à dire qu'ils vivent sur ou dans son hôte qui lui fournit "le toit et le couvert".</li>
+                </ul>
+                <p><span class="highlight">Défenses naturelles</span> :</p>
+                <p>L'homme dispose de barrières naturelles et d'un système immunitaire qui lui permettent de réagir et d'acquérir un état de résistance efficace.</p>
+                <p>Les points par lesquels des micro-organismes s'introduisent dans les tissus sont appelés <span class="highlight">portes d'entrée</span>.</p>
+                <p>Seules certaines espèces compromettent la santé de l'homme : ce sont les <span class="highlight">espèces pathogènes</span>.</p>
+                <p>Par définition : <span class="highlight">un micro-organisme est pathogène lorsque sa présence dans un organisme provoque une maladie</span>.</p>
+            </div>
+        </div>
+
+        <!-- LES DÉFENSES DE L'ORGANISME -->
+        <h2 class="category-title">Les Défenses de l'Organisme</h2>
+
+        <div class="flash-card">
+            <div class="card-header">Le Système Immunitaire</div>
+            <div class="card-content">
+                <p>Notre organisme doit sans cesse se défendre contre des envahisseurs dangereux. Il doit également éliminer les cellules anormales qui apparaissent dans l'organisme.</p>
+                <p>Le contrôle permanent du danger est assuré par notre système immunitaire.</p>
+                <p>Le système immunitaire correspond à l'ensemble des mécanismes de défense de l'organisme. Sans relâche, il s'oppose aux éléments dangereux du non-soi ou du soi altéré qu'il sait distinguer des éléments du soi.</p>
+                <h3>Définitions</h3>
+                <ul>
+                    <li><span class="highlight">Le soi</span> est défini comme l'ensemble des organes, tissus, cellules et molécules propres à l'individu. Ces éléments du soi sont génétiquement déterminés.</li>
+                    <li><span class="highlight">Le non-soi</span> se définit comme tout ce qui ne fait pas partie du soi. Il englobe les éléments étrangers à l'organisme mais aussi certaines cellules anormales de l'individu lui-même (cellules cancéreuses) qui constituent le soi altéré.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- LA PEAU -->
+        <h2 class="category-title">La Peau</h2>
+
+        <div class="flash-card">
+            <div class="card-header">Fiche Synthèse sur la Peau</div>
+            <div class="card-content">
+                <p>La peau est composée de plusieurs couches :</p>
+                <ul>
+                    <li><span class="highlight">Épiderme</span> : couche externe</li>
+                    <li><span class="highlight">Derme</span> : couche intermédiaire contenant les vaisseaux sanguins et les terminaisons nerveuses</li>
+                    <li><span class="highlight">Hypoderme</span> (non visible sur l'image) : couche profonde</li>
+                </ul>
+                <p>Éléments visibles sur la peau :</p>
+                <ul>
+                    <li>Poil</li>
+                    <li>Couche cornée</li>
+                    <li>Corpuscule de Meissner</li>
+                    <li>Réseau vasculaire sanguin</li>
+                    <li>Terminaisons nerveuses libres</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flash-card">
+            <div class="card-header">Les Anomalies du Cuir Chevelu</div>
+            <div class="card-content">
+                <p><span class="highlight">Objectifs</span> :</p>
+                <p>Pour chaque anomalie, il faut :</p>
+                <ul>
+                    <li>Savoir décrire les signes</li>
+                    <li>Expliquer la ou les causes</li>
+                    <li>Indiquer les facteurs aggravants</li>
+                    <li>Préciser la conduite à tenir par les coiffeurs</li>
+                </ul>
+                <p>Le cuir chevelu peut être le siège de lésions très variées semblables à celles de la peau.</p>
+                <p><span class="highlight">Définitions à connaître</span> :</p>
+                <ul>
+                    <li><span class="highlight">Prurit</span> : Sensation de démangeaison de la peau, l'envie de se gratter</li>
+                    <li><span class="highlight">Érythème</span> : Rougeur cutanée due à une afflux sanguin/vasodilatation locale (ex: érythème inflammatoire)</li>
+                    <li><span class="highlight">Vésicule</span> : Soulèvement de l'épiderme rempli de liquide</li>
+                    <li><span class="highlight">Dermatoses</span> : Toutes les affections qui peuvent toucher la peau sont appelées dermatoses dont celles du cuir chevelu</li>
+                </ul>
+                <p>Toutes les affections qui peuvent toucher la peau sont appelées dermatoses.</p>
+            </div>
+        </div>
+
+        <!-- APPAREIL CIRCULATOIRE ET CIRCULATION -->
+        <h2 class="category-title">Appareil Circulatoire et Circulation</h2>
+
+        <div class="flash-card">
+            <div class="card-header">Définition de l'Appareil Circulatoire</div>
+            <div class="card-content">
+                <p>C'est l'ensemble des <span class="highlight">structures</span> qui ravitaillent les tissus en oxygène et en aliments et qui <span class="highlight">évacuent</span> les déchets d'activité cellulaire.</p>
+                <p>Il est composé par un muscle : le <span class="highlight">cœur</span>, et des <span class="highlight">vaisseaux sanguins</span> qui véhiculent le sang.</p>
+                <p>Il est doublé par le <span class="highlight">système lymphatique</span>.</p>
+                <h3>Le Sang et la Lymphe</h3>
+                <p>Le sang est un liquide rouge, visqueux, légèrement alcalin (pH7.35) qui circule dans le cœur et dans les vaisseaux sanguins.</p>
+                <p>Le sang est un tissu conjonctif. Il est composé de <span class="highlight">plasma</span> et d'<span class="highlight">éléments figurés</span> (globules et plaquettes).</p>
+                <p>Issue du sang, la lymphe est un <span class="highlight">liquide incolore ou légèrement jaunâtre</span> qui circule dans les vaisseaux lymphatiques et transite dans les ganglions lymphatiques.</p>
+            </div>
+        </div>
+
+        <div class="flash-card">
+            <div class="card-header">La Circulation Sanguine et Lymphatique</div>
+            <div class="card-content">
+                <p><span class="highlight">La circulation du sang</span> :</p>
+                <ul>
+                    <li>La circulation <span class="highlight">pulmonaire</span> envoie le sang du cœur <span class="highlight">droit</span> dans les artères pulmonaires vers les <span class="highlight">poumons</span> où il est oxygéné. Le sang revient au cœur <span class="highlight">gauche</span> par les veines pulmonaires pour être ensuite pompé.</li>
+                    <li>La circulation <span class="highlight">systémique</span> distribue le sang depuis le cœur à tous les organes par l'intermédiaire des artérioles et artères. Puis ramène le sang chargé de déchets de tous les organes jusqu'au cœur.</li>
+                </ul>
+                <div class="image-container">
+                    <img src="circulation-sanguine.jpg" alt="Schéma de la circulation sanguine" onerror="handleImageError(this)">
+                    <p class="image-error">Image non disponible: Schéma montrant la circulation sanguine avec le cœur, les poumons et les organes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TROUBLES MUSCULO-SQUELETTIQUES -->
+        <h2 class="category-title">Troubles Musculo-Squelettiques</h2>
+
+        <div class="flash-card">
+            <div class="card-header">Définition des TMS</div>
+            <div class="card-content">
+                <p><span class="highlight">Que signifie le sigle TMS ?</span></p>
+                <p>Troubles musculo-squelettiques</p>
+                <p><span class="highlight">Définition</span> : Troubles musculo-squelettiques (TMS) résultent d'un déséquilibre entre les capacités physiques du corps et les sollicitations et contraintes auxquelles il est exposé.</p>
+                <p>Par définition, <span class="highlight">l'ergonomie</span> est l'étude des postes de travail qui permet de limiter l'apparition de troubles musculo-squelettiques (TMS).</p>
+            </div>
+        </div>
+
+        <div class="flash-card">
+            <div class="card-header">L'Appareil Musculo-Squelettique</div>
+            <div class="card-content">
+                <p><span class="highlight">Objectifs</span> :</p>
+                <ul>
+                    <li>Indiquer la structure d'une articulation</li>
+                    <li>Connaître la structure d'un muscle strié</li>
+                    <li>Connaître les fonctions et les propriétés du muscle strié</li>
+                    <li>Décrire les phénomènes nerveux et biochimiques de la contraction musculaire</li>
+                    <li>Définir le tonus musculaire</li>
+                    <li>La fatigue musculaire :
+                        <ul>
+                            <li>L'origine</li>
+                            <li>Les manifestations</li>
+                            <li>Les conséquences</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p><span class="highlight">Définition</span> :</p>
+                <p>L'appareil musculo-squelettique (appareil locomoteur) est l'ensemble du squelette (os et articulations) et du système musculaire.</p>
+                <h3>Le Squelette</h3>
+                <p><span class="highlight">La colonne vertébrale</span> :</p>
+                <p>La colonne vertébrale constitue le squelette du dos. La colonne vertébrale est située au milieu du dos qu'elle sépare en ses côtés gauche et droit. Elle repose sur le bassin, sert de support aux côtes et au crâne.</p>
+            </div>
+        </div>
+
+    <!-- Bouton pour basculer entre les modes -->
+    <button class="toggle-mode" onclick="toggleMode()">Passer en Mode Révision</button>
+
+    <!-- JavaScript pour le mode révision -->
+    <script>
+        // Fonction pour gérer les erreurs de chargement d'image
+        function handleImageError(img) {
+            img.style.display = 'none';
+            img.nextElementSibling.style.display = 'block';
+        }
+        
+        // Questions par catégorie
+        const questions = {
+            introduction: [
+                {
+                    question: "Combien d'espèces de micro-organismes existe-t-il environ ?",
+                    answer: "Plus de 500 000 espèces."
+                },
+                {
+                    question: "Tous les micro-organismes sont-ils dangereux pour l'homme ?",
+                    answer: "Non, la très grande majorité des micro-organismes sont inoffensifs, certains sont même indispensables au maintien de l'équilibre des écosystèmes."
+                },
+                {
+                    question: "Qu'est-ce qu'un micro-organisme pathogène ?",
+                    answer: "Un micro-organisme est pathogène lorsque sa présence dans un organisme provoque une maladie."
+                },
+                {
+                    question: "Comment appelle-t-on les points par lesquels des micro-organismes s'introduisent dans les tissus ?",
+                    answer: "Les portes d'entrée."
+                },
+                {
+                    question: "Qu'est-ce que le parasitisme en microbiologie ?",
+                    answer: "C'est lorsque des micro-organismes vivent sur ou dans un hôte qui leur fournit 'le toit et le couvert'."
+                }
+            ],
+            defenses: [
+                {
+                    question: "Qu'est-ce que le système immunitaire ?",
+                    answer: "Le système immunitaire correspond à l'ensemble des mécanismes de défense de l'organisme."
+                },
+                {
+                    question: "Comment définit-on 'le soi' en immunologie ?",
+                    answer: "Le soi est défini comme l'ensemble des organes, tissus, cellules et molécules propres à l'individu. Ces éléments du soi sont génétiquement déterminés."
+                },
+                {
+                    question: "Comment définit-on 'le non-soi' en immunologie ?",
+                    answer: "Le non-soi se définit comme tout ce qui ne fait pas partie du soi. Il englobe les éléments étrangers à l'organisme mais aussi certaines cellules anormales de l'individu lui-même (cellules cancéreuses) qui constituent le soi altéré."
+                },
+                {
+                    question: "Quels sont les deux types d'éléments que le système immunitaire doit combattre ?",
+                    answer: "Les envahisseurs dangereux (éléments du non-soi) et les cellules anormales qui apparaissent dans l'organisme (soi altéré)."
+                },
+                {
+                    question: "Qu'est-ce que le soi altéré ?",
+                    answer: "Ce sont des cellules anormales de l'individu lui-même, comme les cellules cancéreuses, que le système immunitaire doit éliminer."
+                }
+            ],
+            peau: [
+                {
+                    question: "Quelles sont les principales couches de la peau ?",
+                    answer: "L'épiderme (couche externe), le derme (couche intermédiaire) et l'hypoderme (couche profonde)."
+                },
+                {
+                    question: "Qu'est-ce que le prurit ?",
+                    answer: "Le prurit est une sensation de démangeaison de la peau, l'envie de se gratter."
+                },
+                {
+                    question: "Qu'est-ce qu'un érythème ?",
+                    answer: "Un érythème est une rougeur cutanée due à un afflux sanguin/vasodilatation locale (ex: érythème inflammatoire)."
+                },
+                {
+                    question: "Qu'est-ce qu'une vésicule ?",
+                    answer: "Une vésicule est un soulèvement de l'épiderme rempli de liquide."
+                },
+                {
+                    question: "Comment appelle-t-on l'ensemble des affections qui peuvent toucher la peau ?",
+                    answer: "Les dermatoses."
+                },
+                {
+                    question: "Quels sont les objectifs à connaître pour chaque anomalie du cuir chevelu ?",
+                    answer: "- Savoir décrire les signes\n- Expliquer la ou les causes\n- Indiquer les facteurs aggravants\n- Préciser la conduite à tenir par les coiffeurs"
+                }
+            ],
+            circulation: [
+                {
+                    question: "Qu'est-ce que l'appareil circulatoire ?",
+                    answer: "C'est l'ensemble des structures qui ravitaillent les tissus en oxygène et en aliments et qui évacuent les déchets d'activité cellulaire."
+                },
+                {
+                    question: "De quoi est composé l'appareil circulatoire ?",
+                    answer: "Il est composé par un muscle : le cœur, et des vaisseaux sanguins qui véhiculent le sang. Il est doublé par le système lymphatique."
+                },
+                {
+                    question: "Qu'est-ce que le sang ?",
+                    answer: "Le sang est un liquide rouge, visqueux, légèrement alcalin (pH7.35) qui circule dans le cœur et dans les vaisseaux sanguins. C'est un tissu conjonctif composé de plasma et d'éléments figurés (globules et plaquettes)."
+                },
+                {
+                    question: "Qu'est-ce que la lymphe ?",
+                    answer: "La lymphe est un liquide incolore ou légèrement jaunâtre qui circule dans les vaisseaux lymphatiques et transite dans les ganglions lymphatiques. Elle est issue du sang."
+                },
+                {
+                    question: "Quels sont les deux types de circulation sanguine ?",
+                    answer: "La circulation pulmonaire (entre le cœur et les poumons) et la circulation systémique (entre le cœur et le reste du corps)."
+                }
+            ],
+            tms: [
+                {
+                    question: "Que signifie le sigle TMS ?",
+                    answer: "Troubles musculo-squelettiques."
+                },
+                {
+                    question: "Comment définit-on les troubles musculo-squelettiques ?",
+                    answer: "Les troubles musculo-squelettiques (TMS) résultent d'un déséquilibre entre les capacités physiques du corps et les sollicitations et contraintes auxquelles il est exposé."
+                },
+                {
+                    question: "Qu'est-ce que l'ergonomie ?",
+                    answer: "L'ergonomie est l'étude des postes de travail qui permet de limiter l'apparition de troubles musculo-squelettiques (TMS)."
+                },
+                {
+                    question: "Qu'est-ce que l'appareil musculo-squelettique ?",
+                    answer: "L'appareil musculo-squelettique (appareil locomoteur) est l'ensemble du squelette (os et articulations) et du système musculaire."
+                },
+                {
+                    question: "Quels sont les objectifs d'étude concernant l'appareil musculo-squelettique ?",
+                    answer: "- Indiquer la structure d'une articulation\n- Connaître la structure d'un muscle strié\n- Connaître les fonctions et les propriétés du muscle strié\n- Décrire les phénomènes nerveux et biochimiques de la contraction musculaire\n- Définir le tonus musculaire\n- Comprendre la fatigue musculaire (origine, manifestations, conséquences)"
+                },
+                {
+                    question: "Qu'est-ce que la colonne vertébrale ?",
+                    answer: "La colonne vertébrale constitue le squelette du dos. Elle est située au milieu du dos qu'elle sépare en ses côtés gauche et droit. Elle repose sur le bassin, sert de support aux côtes et au crâne."
+                }
+            ]
+        };
+
+        let currentCategory = 'introduction';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalQuestions = 0;
+        let questionsToReview = [];
+        let isReviewMode = false;
+        let reviewedQuestions = new Set(); // Pour suivre les questions déjà révisées
+
+        // Fonction pour charger une catégorie
+        function loadCategory(category) {
+            currentCategory = category;
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = questions[category].length;
+            questionsToReview = [];
+            reviewedQuestions = new Set();
+            isReviewMode = false;
+            
+            document.getElementById('total-questions').textContent = totalQuestions;
+            document.getElementById('score').textContent = score;
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('question-container').style.display = 'block';
+            
+            // Réinitialiser le titre
+            document.querySelector('.revision-title').textContent = 'Mode Révision';
+            
+            loadQuestion();
+        }
+
+        // Fonction pour charger une question
+        function loadQuestion() {
+            const questionData = isReviewMode 
+                ? questions[currentCategory][questionsToReview[currentQuestionIndex]] 
+                : questions[currentCategory][currentQuestionIndex];
+                
+            document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('question-text').textContent = questionData.question;
+            document.getElementById('answer-container').innerHTML = `<p>${questionData.answer.replace(/\n/g, '<br>')}</p>`;
+            document.getElementById('answer-container').style.display = 'none';
+        }
+
+        // Fonction pour afficher/masquer la réponse
+        function toggleAnswer() {
+            const answerContainer = document.getElementById('answer-container');
+            if (answerContainer.style.display === 'none') {
+                answerContainer.style.display = 'block';
+            } else {
+                answerContainer.style.display = 'none';
+            }
+        }
+
+        // Fonction pour "Je savais"
+        function knewAnswer() {
+            score++;
+            document.getElementById('score').textContent = score;
+            
+            if (isReviewMode) {
+                // Marquer cette question comme maîtrisée
+                reviewedQuestions.add(currentQuestionIndex);
+            }
+            
+            nextQuestionOrShowResults();
+        }
+
+        // Fonction pour "Je ne savais pas"
+        function didntKnowAnswer() {
+            if (!isReviewMode) {
+                // Ajouter cette question à la liste des questions à revoir
+                if (!questionsToReview.includes(currentQuestionIndex)) {
+                    questionsToReview.push(currentQuestionIndex);
+                }
+            }
+            // En mode révision, on ne fait rien de spécial, la question reste dans la liste
+            
+            nextQuestionOrShowResults();
+        }
+        
+        // Fonction pour passer à la question suivante ou afficher les résultats
+        function nextQuestionOrShowResults() {
+            if (isReviewMode) {
+                if (currentQuestionIndex < questionsToReview.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            } else {
+                if (currentQuestionIndex < questions[currentCategory].length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }
+        }
+        
+        // Fonction pour afficher les résultats
+        function showResults() {
+            document.getElementById('question-container').style.display = 'none';
+            document.getElementById('results-container').style.display = 'block';
+            
+            if (isReviewMode) {
+                // Filtrer les questions qui ont été maîtrisées
+                const remainingQuestions = [];
+                for (let i = 0; i < questionsToReview.length; i++) {
+                    if (!reviewedQuestions.has(i)) {
+                        remainingQuestions.push(questionsToReview[i]);
+                    }
+                }
+                
+                // Mettre à jour la liste des questions à revoir
+                questionsToReview = remainingQuestions;
+                
+                // Si on était en mode révision, mettre à jour le texte des résultats
+                document.getElementById('results-score').textContent = `Vous avez maîtrisé ${score} questions sur ${totalQuestions}`;
+                
+                // Afficher le bouton de révision seulement s'il reste des questions à revoir
+                const reviewButton = document.querySelector('.restart-button:nth-child(2)');
+                if (questionsToReview.length > 0) {
+                    reviewButton.style.display = 'inline-block';
+                    reviewButton.textContent = `Revoir les ${questionsToReview.length} questions restantes`;
+                } else {
+                    reviewButton.style.display = 'none';
+                    document.getElementById('results-score').textContent = `Félicitations ! Vous avez maîtrisé toutes les questions.`;
+                }
+            } else {
+                // Mode normal
+                document.getElementById('results-score').textContent = `Vous avez obtenu ${score}/${totalQuestions}`;
+                
+                // Afficher le bouton de révision seulement s'il y a des questions à revoir
+                const reviewButton = document.querySelector('.restart-button:nth-child(2)');
+                if (questionsToReview.length > 0) {
+                    reviewButton.style.display = 'inline-block';
+                    reviewButton.textContent = `Revoir les ${questionsToReview.length} questions non maîtrisées`;
+                } else {
+                    reviewButton.style.display = 'none';
+                }
+            }
+        }
+        
+        // Fonction pour recommencer le quiz
+        function restartQuiz() {
+            loadCategory(currentCategory);
+        }
+        
+        // Fonction pour revoir les questions non maîtrisées
+        function reviewMissedQuestions() {
+            if (questionsToReview.length === 0) {
+                alert('Félicitations ! Vous avez maîtrisé toutes les questions.');
+                return;
+            }
+            
+            isReviewMode = true;
+            currentQuestionIndex = 0;
+            score = 0;
+            totalQuestions = questionsToReview.length;
+            
+            document.getElementById('total-questions').textContent = totalQuestions;
+            document.getElementById('score').textContent = score;
+            document.getElementById('results-container').style.display = 'none';
+            document.getElementById('question-container').style.display = 'block';
+            
+            // Mise à jour du texte pour indiquer qu'on est en mode révision
+            document.querySelector('.revision-title').textContent = `Révision - ${currentCategory}`;
+            
+            loadQuestion();
+        }
+
+        // Fonction pour basculer entre les modes
+        function toggleMode() {
+            const revisionMode = document.getElementById('revision-mode');
+            const studyMode = document.getElementById('study-mode');
+            const toggleButton = document.querySelector('.toggle-mode');
+            
+            if (revisionMode.style.display === 'none' || revisionMode.style.display === '') {
+                revisionMode.style.display = 'block';
+                studyMode.style.display = 'none';
+                toggleButton.textContent = 'Passer en Mode Étude';
+                loadCategory('introduction');
+            } else {
+                revisionMode.style.display = 'none';
+                studyMode.style.display = 'block';
+                toggleButton.textContent = 'Passer en Mode Révision';
+            }
+        }
+    </script>
+</body>
+</html>
